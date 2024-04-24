@@ -1,9 +1,10 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { API_CONSTANTS } from 'src/common/constants';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
 
 export async function getSwaggerConfiguration(
-  app: NestExpressApplication,
+  app: NestExpressApplication | NestFastifyApplication,
 ) {
   const title = `${API_CONSTANTS.PROJECT_NAME}`;
   const description = `The ${API_CONSTANTS.PROJECT_NAME} API description`;

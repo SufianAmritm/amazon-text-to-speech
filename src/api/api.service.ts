@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateApiDto } from './dto/create-api.dto';
-import { UpdateApiDto } from './dto/update-api.dto';
-
+import {  Inject, Injectable } from '@nestjs/common';
+import { PollyService } from './aws/aws-polly';
 @Injectable()
 export class ApiService {
-  create(createApiDto: CreateApiDto) {
-    return 'This action adds a new api';
+  constructor(
+    @Inject(PollyService) private readonly pollyService: PollyService,
+  ) {}
+  async createAudio(text: string) {
+    const voice = await this.pollyService.createAudio({
+      OutputFormat: 'mp3',
+      Text: text,
+      VoiceId: 'Joanna',
+      Engine: 'neural',
+      LanguageCode: 'en-US',
+      TextType:'text'
+    });
+
+    const stream = await voice.AudioStream.transformToByteArray();
+
+    return {
+      stream: stream,
+      headers: new Headers({
+        'Content-Type': voice.ContentType,
+      }),
+    };
   }
 
-  findAll() {
-    return `This action returns all api`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} api`;
-  }
-
-  update(id: number, updateApiDto: UpdateApiDto) {
-    return `This action updates a #${id} api`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} api`;
-  }
 }

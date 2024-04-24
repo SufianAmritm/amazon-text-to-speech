@@ -1,34 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  BadRequestException,
+  Res,
+} from '@nestjs/common';
 import { ApiService } from './api.service';
 import { CreateApiDto } from './dto/create-api.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
+import { isString } from 'class-validator';
+import { Response } from 'express';
 
 @Controller('api')
 export class ApiController {
   constructor(private readonly apiService: ApiService) {}
 
   @Post()
-  create(@Body() createApiDto: CreateApiDto) {
-    return this.apiService.create(createApiDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.apiService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.apiService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApiDto: UpdateApiDto) {
-    return this.apiService.update(+id, updateApiDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.apiService.remove(+id);
+  async create(@Body() body: { text: string }, @Res() res: Response) {
+    if (!body.text || !isString(body.text)) {
+      throw new BadRequestException('text is required and must be a string');
+    }
+    const voice = await this.apiService.createAudio(body.text);
+    res.set(voice.headers).send(Buffer.from(voice.stream.buffer));
   }
 }
