@@ -82,10 +82,10 @@ export class ResponseFactory {
     if (environment !== NODE_ENV.DEVELOPMENT) {
       delete errorResponse.error.stack;
     }
-    
+
     return errorResponse;
   }
-  
+
   private static getSuccessResponse(
     successMessage: string,
     code: number,
